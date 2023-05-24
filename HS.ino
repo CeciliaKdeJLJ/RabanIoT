@@ -24,6 +24,11 @@ void setup()
     for(;;); // Don't proceed, loop forever
   }
   display.clearDisplay();
+  
+  if(!lightMeter.begin(BH1750::CONTINUOUS_HIGH_RES_MODE)) {
+    Serial.println(F("Could not begin BH1750"));
+    for(;;); // Don't proceed, loop forever
+  }
 }
 
 void loop() 
@@ -34,15 +39,9 @@ void loop()
   // Humidity processing
   int humedad = analogRead(SENSOR_PIN);
   int porcentajeHumedad = map(humedad, HUMEDAD_AIRE, HUMEDAD_AGUA, 0, 100);
-  if (porcentajeHumedad > 100) {
-    porcentajeHumedad = 100;
-  }
+  porcentajeHumedad = constrain(porcentajeHumedad, 0, 100);
 
   // Light processing
-  if(!lightMeter.begin(BH1750::ONE_TIME_HIGH_RES_MODE)) {
-    Serial.println(F("Could not begin BH1750"));
-    for(;;); // Don't proceed, loop forever
-  }
   float lux = lightMeter.readLightLevel();
 
   // Display humidity and light data
@@ -54,16 +53,15 @@ void loop()
   Serial.println(" lux");
 
   // Display Humidity
-  display.setTextSize(2);
+  display.setTextSize(1);
   display.setCursor(0, 0);
-  display.println("Humedad:");
+  display.print("Humedad: ");
   display.print(porcentajeHumedad);
   display.println("%");
 
   // Display Light
-  display.setTextSize(2);
-  display.setCursor(0, 32);
-  display.println("Luz:");
+  display.setCursor(0, 20);
+  display.print("Luz: ");
   display.print(lux);
   display.println(" lux");
 
@@ -71,3 +69,4 @@ void loop()
 
   delay(DELAY_TIME);
 }
+
